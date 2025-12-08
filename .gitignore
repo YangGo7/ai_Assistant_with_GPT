@@ -1,1 +1,17 @@
+
+# 학습 폴더 무시 
+email_csv/
+# 로그 파일 무시
+*.log
+
+# venv 폴더 무시
+venv/
+
+# VSCode 설정 무시
+.vscode/
+
+# 캐시
+__pycache__/
+
+# 환경변수 파일
 .env
