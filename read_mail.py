@@ -24,6 +24,7 @@ else:
     print('총 메일 개수', len(mail_ids))
     latest_10 = mail_ids[-10:]
     
+    emails = []
     for mid in reversed(latest_10):
         status , msg_data = mail.fetch(mid,'(RFC822)')
         raw_email = msg_data[0][1]
@@ -33,9 +34,9 @@ else:
         subject , encoding = decode_header(raw_subject)[0]
         if isinstance(subject , bytes):
             subject = subject.decode(encoding or "utf-8", errors = 'ignore')
-        print("=" * 80)
-        print("mail ID:", mid.decode())
-        print("제목: ",subject)
+        # print("=" * 80)
+        # print("mail ID:", mid.decode())
+        # print("제목: ",subject)
         
         body_text = ""
         if msg.is_multipart():
@@ -52,9 +53,18 @@ else:
                 body_text = msg.get_payload(decode = True).decode('utf-8',errors = 'ignore')
             except Exception:
                 pass
+        emails.append({
+            "id":mid.decode(),
+            "subject": subject,
+            "body": body_text,
+        })
+        
     
-    print("본문 일부:")
-    print(body_text[:200].replace("\n", " "))
-    print()
+    print("메일 수집 완료")
+    for e in emails:
+        print(e['id'] , e['subject'])
+    # print("본문 일부:")
+    # print(body_text[:200].replace("\n", " "))
+    # print()
 
 mail.logout()
