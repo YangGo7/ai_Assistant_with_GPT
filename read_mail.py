@@ -6,6 +6,7 @@ import os
 import re
 import pandas as pd
 import joblib
+from utils.email_parser import parse_email 
 load_dotenv()
 
 def clean_code(text : str) -> str:
@@ -46,44 +47,7 @@ else:
         raw_email = msg_data[0][1]
         msg = email.message_from_bytes(raw_email)
         
-        raw_subject = msg.get('Subject', "")
-        subject , encoding = decode_header(raw_subject)[0]
-        if isinstance(subject , bytes):
-            subject = subject.decode(encoding or "utf-8", errors = 'ignore')
-        # print("=" * 80)
-        # print("mail ID:", mid.decode())
-        # print("제목: ",subject)
-        
-        body_text = ""
-        if msg.is_multipart():
-            for part in msg.walk():
-                ctype = part.get_content_type()
-                if ctype == "text/plain":
-                    try:
-                        body_text =part.get_payload(decode = True).decode('utf-8', errors= 'ignore')
-                    except Exception:
-                        pass
-                    break
-        else:
-            try:
-                body_text = msg.get_payload(decode = True).decode('utf-8',errors = 'ignore')
-            except Exception:
-                pass
-        subject_clean = clean_code(subject)
-        body_clean = clean_code(body_text)    
-        text = (subject + " " + body_text).strip()
-        
-        # 학습 만들땐 주석처리 
-        predicted_label = clf.predict([text])[0]      
-        
-        
-        emails.append({
-            "id":mid.decode(),
-            "subject": subject_clean,
-            "body": body_clean,
-            #학습만들땐 주석처리 
-            "label": predicted_label,
-        })
+        record = parse_email(msg)
         
     
     print("메일 수집 완료")
